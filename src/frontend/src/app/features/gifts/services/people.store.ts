@@ -15,16 +15,23 @@ import {
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { setFulfilled, setPending, withRequestStatus } from '@shared/index';
+import {
+  setError,
+  setFulfilled,
+  setPending,
+  withRequestStatus,
+} from '@shared/index';
 import { map, mergeMap, pipe, switchMap, tap } from 'rxjs';
-import { PeopleCreate, PeopleEntity } from '../types';
-import { GiftDataService, PersonItem } from './gift-data.service';
+import { ApiPersonItem, PeopleCreate, PeopleEntity } from '../types';
+import { GiftDataService } from './gift-data.service';
+import { tapResponse } from '@ngrx/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export const PeopleStore = signalStore(
   withDevtools('people-store'),
   withRequestStatus(),
-  withEntities({ collection: '_serverPeople', entity: type<PersonItem>() }),
-  withEntities({ collection: '_tempPeople', entity: type<PersonItem>() }),
+  withEntities({ collection: '_serverPeople', entity: type<ApiPersonItem>() }),
+  withEntities({ collection: '_tempPeople', entity: type<ApiPersonItem>() }),
   withMethods((store) => {
     // injection context
     const service = inject(GiftDataService);
@@ -51,7 +58,7 @@ export const PeopleStore = signalStore(
       addPerson: rxMethod<PeopleCreate>(
         pipe(
           map((p) => {
-            const tempPerson: PersonItem = {
+            const tempPerson: ApiPersonItem = {
               id: crypto.randomUUID(),
               name: p.name,
               isLocal: p.location === 'local',
@@ -66,15 +73,17 @@ export const PeopleStore = signalStore(
 
           mergeMap(([p, tempId]) =>
             service.addPerson(p, tempId).pipe(
-              tap((result) =>
-                patchState(
-                  store,
-                  addEntity(result.person, { collection: '_serverPeople' }),
-                  removeEntity(result.temporaryId, {
-                    collection: '_tempPeople',
-                  }),
-                ),
-              ),
+              tapResponse({
+                next: (r) =>
+                  patchState(
+                    store,
+                    addEntity(r.person, { collection: '_serverPeople' }),
+                    removeEntity(r.temporaryId, { collection: '_tempPeople' }),
+                  ),
+                error: (e: HttpErrorResponse) =>
+                  patchState(store, setError(e.statusText)),
+                finalize() {},
+              }),
             ),
           ),
         ),
@@ -85,25 +94,11 @@ export const PeopleStore = signalStore(
   withComputed((store) => {
     return {
       entities: computed(() => {
-        const serverPeople = store._serverPeopleEntities().map(
-          (p) =>
-            ({
-              id: p.id,
-              name: p.name,
-              location: p.isLocal ? 'local' : 'remote',
-              isPending: false,
-            }) as PeopleEntity,
-        );
+        const serverPeople = store
+          ._serverPeopleEntities()
+          .map(mapApiToRealEntity);
 
-        const tempPeople = store._tempPeopleEntities().map(
-          (p) =>
-            ({
-              id: p.id,
-              name: p.name,
-              location: p.isLocal ? 'local' : 'remote',
-              isPending: true,
-            }) as PeopleEntity,
-        );
+        const tempPeople = store._tempPeopleEntities().map(mapApiToTempEntity);
 
         return [...serverPeople, ...tempPeople];
       }),
@@ -128,4 +123,22 @@ export const PeopleStore = signalStore(
   }),
 );
 
-// function mapApiPersontoEntity()
+function mapApiPersonToEntity(
+  entity: ApiPersonItem,
+  isPending: boolean,
+): PeopleEntity {
+  return {
+    id: entity.id,
+    name: entity.name,
+    location: entity.isLocal ? 'local' : 'remote',
+    isPending,
+  };
+}
+
+function mapApiToTempEntity(entity: ApiPersonItem) {
+  return mapApiPersonToEntity(entity, true);
+}
+
+function mapApiToRealEntity(entity: ApiPersonItem) {
+  return mapApiPersonToEntity(entity, false);
+}

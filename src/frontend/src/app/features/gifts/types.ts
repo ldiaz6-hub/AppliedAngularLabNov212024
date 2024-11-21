@@ -10,3 +10,11 @@ export type PeopleEntity = Omit<PeopleGiftListModelItem, 'ideas'> & {
 };
 
 export type PeopleCreate = Omit<PeopleEntity, 'id' | 'isPending'>;
+export type ApiResult = {
+  people: ApiPersonItem[];
+};
+export type ApiPersonItem = {
+  id: string;
+  name: string;
+  isLocal: boolean;
+};
