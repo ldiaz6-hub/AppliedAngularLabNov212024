@@ -63,7 +63,10 @@ export class NavBarComponent implements OnInit {
       path:'books',
       text: 'Books'
     },
-
+    {
+      path:'fibonacci',
+      text:'Fibonacci'
+    },
     {
       text: 'About Us',
       path: 'about',

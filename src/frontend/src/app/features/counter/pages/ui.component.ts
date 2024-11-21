@@ -22,7 +22,7 @@ import { CounterStore } from '../services/counter.store';
       </button>
       <span data-testid="current">{{ store.current() }}</span>
       <button (click)="store.increment()" class="btn btn-primary">+</button>
-      <button (click)="store.reset()" class="btn btn-primary">Reset</button>
+      <button (click)="store.reset()" class="btn btn-success">Reset</button>
 
       <div>
         <span>{{ store.fizzBuzz() }}</span>

@@ -27,10 +27,15 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/counter/counter.routes').then((r) => r.COUNTER_ROUTES),
   },
-    {
+  {
     path: 'books',
     loadChildren: () =>
       import('./features/books/books.routes').then((r) => r.BOOKS_ROUTES),
+  },
+  {
+    path: 'fibonacci',
+    loadChildren: () =>
+      import('./features/fibonacci/fibonacci.routes').then((r) => r.FIBONACCI_ROUTES),
   },
   {
     path: '**',
