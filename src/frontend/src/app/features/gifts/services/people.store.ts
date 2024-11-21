@@ -21,7 +21,7 @@ import {
   setPending,
   withRequestStatus,
 } from '@shared/index';
-import { map, mergeMap, pipe, switchMap, tap } from 'rxjs';
+import { catchError, map, mergeMap, pipe, switchMap, tap } from 'rxjs';
 import { ApiPersonItem, PeopleCreate, PeopleEntity } from '../types';
 import { GiftDataService } from './gift-data.service';
 import { tapResponse } from '@ngrx/operators';
@@ -73,6 +73,7 @@ export const PeopleStore = signalStore(
 
           mergeMap(([p, tempId]) =>
             service.addPerson(p, tempId).pipe(
+             
               tapResponse({
                 next: (r) =>
                   patchState(

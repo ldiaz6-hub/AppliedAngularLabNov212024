@@ -1,8 +1,9 @@
-import { HttpResponse, http } from 'msw';
+import { HttpResponse, http, delay } from 'msw';
 import books from './books';
 
 const handlers = [
-  http.get('/api/books', () => {
+  http.get('/api/books', async () => {
+    await delay(5000);
     return HttpResponse.json({ data: books });
   }),
 ];
