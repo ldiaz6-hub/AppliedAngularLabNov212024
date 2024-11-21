@@ -15,10 +15,17 @@ import {
   withEntities,
 } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { setFulfilled, setPending, withRequestStatus } from '@shared/index';
+import {
+  setError,
+  setFulfilled,
+  setPending,
+  withRequestStatus,
+} from '@shared/index';
 import { map, mergeMap, pipe, switchMap, tap } from 'rxjs';
 import { ApiPersonItem, PeopleCreate, PeopleEntity } from '../types';
 import { GiftDataService } from './gift-data.service';
+import { tapResponse } from '@ngrx/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export const PeopleStore = signalStore(
   withDevtools('people-store'),
@@ -66,15 +73,17 @@ export const PeopleStore = signalStore(
 
           mergeMap(([p, tempId]) =>
             service.addPerson(p, tempId).pipe(
-              tap((result) =>
-                patchState(
-                  store,
-                  addEntity(result.person, { collection: '_serverPeople' }),
-                  removeEntity(result.temporaryId, {
-                    collection: '_tempPeople',
-                  }),
-                ),
-              ),
+              tapResponse({
+                next: (r) =>
+                  patchState(
+                    store,
+                    addEntity(r.person, { collection: '_serverPeople' }),
+                    removeEntity(r.temporaryId, { collection: '_tempPeople' }),
+                  ),
+                error: (e: HttpErrorResponse) =>
+                  patchState(store, setError(e.statusText)),
+                finalize() {},
+              }),
             ),
           ),
         ),

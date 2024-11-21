@@ -36,6 +36,10 @@ const handlers = [
       name: string;
       isLocal: boolean;
     };
+
+    if (body.name === 'Jeff') {
+      return HttpResponse.json({ error: 'Not that guy' }, { status: 400 });
+    }
     const entity = { id: crypto.randomUUID(), ...body };
     testPeople.unshift(entity);
     return HttpResponse.json(entity);
