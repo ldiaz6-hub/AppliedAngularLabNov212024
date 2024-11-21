@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   resource,
   computed,
+  signal,
 } from '@angular/core';
 
 export type BookEntity = {
@@ -17,6 +18,11 @@ export type BookEntity = {
   year: number;
   id: string;
 };
+
+export type SortKeys = keyof Pick<
+  BookEntity,
+  'id' | 'title' | 'author' | 'year'
+>;
 
 @Component({
   selector: 'app-books',
@@ -34,14 +40,46 @@ export type BookEntity = {
         <!-- head -->
         <thead>
           <tr>
-            <th>Id</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Year</th>
+            <th>
+              <button
+                class="btn btn-xs"
+                [disabled]="sortedBy() === 'id'"
+                (click)="setSort('id')"
+              >
+                Id
+              </button>
+            </th>
+            <th>
+              <button
+                class="btn btn-xs"
+                [disabled]="sortedBy() === 'title'"
+                (click)="setSort('title')"
+              >
+                Title
+              </button>
+            </th>
+            <th>
+              <button
+                class="btn btn-xs"
+                [disabled]="sortedBy() === 'author'"
+                (click)="setSort('author')"
+              >
+                Author
+              </button>
+            </th>
+            <th>
+              <button
+                class="btn btn-xs"
+                [disabled]="sortedBy() === 'year'"
+                (click)="setSort('year')"
+              >
+                Year
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
-          @for (book of books.value(); track book.id) {
+          @for (book of booksSorted(); track book.id) {
             <tr>
               <th>{{ book.id }}</th>
               <td>{{ book.title }}</td>
@@ -63,6 +101,24 @@ export class BooksComponent {
         .then((r) => r.data),
   });
 
+  sortedBy = signal<SortKeys>('id');
+  booksSorted = computed(() => {
+    const books = this.books.value() || [];
+    const sortedBy = this.sortedBy();
+    if (sortedBy !== 'id' && sortedBy !== 'year') {
+      return books.sort((a, b) =>
+        a[this.sortedBy()]
+          .toString()
+          .localeCompare(b[this.sortedBy()].toString()),
+      );
+    } else {
+      return books.sort((a, b) => +a[this.sortedBy()] - +b[this.sortedBy()]);
+    }
+  });
+
+  setSort(by: SortKeys) {
+    this.sortedBy.set(by);
+  }
   stats = computed(() => {
     const books = this.books.value() || [];
     const numberOfBooks = books.length;
