@@ -9,6 +9,7 @@ import { FeatureDirective } from '../shared/feature-management/feature.directive
   providers: [GiftDataService],
   template: `
     <h1>Above</h1>
+    <p>Jeff Lab</p>
     @defer {
       <div *feature="'home-page'" class="alert alert-info">
         <h2>How is the home page coming!</h2>
