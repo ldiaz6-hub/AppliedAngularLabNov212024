@@ -1,0 +1,48 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor",
+  "elements": [
+    {
+      "id": "6rZnYiL2lAioatlbQMsPI",
+      "type": "text",
+      "x": 347,
+      "y": 195,
+      "width": 683.7994384765625,
+      "height": 325,
+      "angle": 0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "roundness": null,
+      "seed": 380710733,
+      "version": 211,
+      "versionNonce": 903524483,
+      "isDeleted": false,
+      "boundElements": null,
+      "updated": 1732034596946,
+      "link": null,
+      "locked": false,
+      "text": "node_modules -this is shared across EVERYTHING in the application.\n    - coreui (daisyui)\nsrc\n    app\n        shared\n            -\n        components\n        services\n        features\n            - gifts\n                components\n                services\n        ",
+      "fontSize": 20,
+      "fontFamily": 1,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "baseline": 318,
+      "containerId": null,
+      "originalText": "node_modules -this is shared across EVERYTHING in the application.\n    - coreui (daisyui)\nsrc\n    app\n        shared\n            -\n        components\n        services\n        features\n            - gifts\n                components\n                services\n        ",
+      "lineHeight": 1.25
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}
